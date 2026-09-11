@@ -23,19 +23,17 @@ class ProductTab(ctk.CTkFrame): # Kế thừa CTkFrame
                      font=("Segoe UI", 20, "bold"), text_color=("#0984e3", "white")).pack(pady=20)
 
         # Các Nút Thao Tác
-        self.btn_add = self.create_sidebar_button("➕ Thêm Laptop", "#00b894", "#00a884", self.open_add_popup)
-        self.btn_edit = self.create_sidebar_button("✏️ Cập Nhật", "#fdcb6e", "#e1b12c", self.open_edit_popup)
-        
         if self.current_user['role'] == 'admin':
+            self.btn_add = self.create_sidebar_button("➕ Thêm Laptop", "#00b894", "#00a884", self.open_add_popup)
+            self.btn_edit = self.create_sidebar_button("✏️ Cập Nhật", "#fdcb6e", "#e1b12c", self.open_edit_popup)
             self.btn_del = self.create_sidebar_button("🗑️ Xóa Laptop", "#ff7675", "#d63031", self.delete_product)
+            ToolTip(self.btn_add, "Thêm sản phẩm mới vào kho")
+            ToolTip(self.btn_edit, "Sửa thông tin sản phẩm đã chọn")
+            ToolTip(self.btn_del, "Xóa vĩnh viễn sản phẩm")
             
         self.btn_reload = self.create_sidebar_button("🔄 Tải Lại", "#2563eb", "#1d4ed8", self.reload_data, text_color="white")
         self.btn_export = self.create_sidebar_button("📤 Xuất Excel", "#16a34a", "#15803d", self.export_excel, text_color="white")
         
-        ToolTip(self.btn_add, "Thêm sản phẩm mới vào kho")
-        ToolTip(self.btn_edit, "Sửa thông tin sản phẩm đã chọn")
-        if self.current_user['role'] == 'admin':
-            ToolTip(self.btn_del, "Xóa vĩnh viễn sản phẩm")
         ToolTip(self.btn_reload, "Tải lại danh sách từ cơ sở dữ liệu")
         ToolTip(self.btn_export, "Xuất danh sách sản phẩm ra file Excel")
 
