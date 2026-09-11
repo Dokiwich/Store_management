@@ -1,0 +1,12 @@
+## ⚙️ Hướng dẫn cài đặt (Installation)
+
+Dự án yêu cầu cài đặt **Python** và **MySQL** (thông qua XAMPP hoặc MySQL Server).
+
+### Bước 1: Clone dự án
+```bash
+
+### Bước 2: Cài thư viện pip install -r requirements.txt
+###Bước 3: Cấu hình Cơ sở dữ liệu
+Mở XAMPP hoặc MySQL, khởi động
+Import file SQL: database/laptop_shop_pro.sql (File này nằm trong thư mục database của dự án).
+### Bước 4: chạy python main.py
