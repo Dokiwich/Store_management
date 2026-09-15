@@ -13,9 +13,6 @@ class PosTab(ctk.CTkFrame): # Kế thừa CTkFrame
         
         self.current_applied_voucher = None
         self.current_user_id = current_user['id'] if current_user else 1
-        
-        self.cart = [] 
-        self.cart_total = 0 
 
         # --- LAYOUT CHÍNH (GRID 2 CỘT) ---
         self.grid_columnconfigure(0, weight=6) # Cột trái (DS Sản phẩm) chiếm 6 phần
@@ -140,32 +137,9 @@ class PosTab(ctk.CTkFrame): # Kế thừa CTkFrame
         self.load_products(self.entry_search.get())
 
     def add_product_by_id(self, p_id):
-        product = self.product_service.get_product_by_id(p_id)
-        if not product: return
-
-        p_name = product[2]
-        p_price = float(product[6])
-        p_stock = int(product[7])
-
-        if p_stock <= 0:
-            messagebox.showwarning("Hết hàng", f"Sản phẩm {p_name} tạm hết hàng!")
-            return
-
-        found = False
-        for c in self.cart:
-            if c['id'] == p_id:
-                if c['qty'] < p_stock:
-                    c['qty'] += 1
-                    c['total'] = c['qty'] * p_price
-                    found = True
-                else:
-                    messagebox.showwarning("Kho", "Đã đạt giới hạn tồn kho!")
-                    return
-                break
-        
-        if not found:
-            self.cart.append({'id': p_id, 'name': p_name, 'price': p_price, 'qty': 1, 'total': p_price})
-        
+        success, msg = self.order_service.add_to_cart(p_id, 1)
+        if not success:
+            messagebox.showwarning("Cảnh báo", msg)
         self.update_cart_ui()
 
     def add_to_cart(self, event):
@@ -179,26 +153,26 @@ class PosTab(ctk.CTkFrame): # Kế thừa CTkFrame
         sel = self.tree_cart.selection()
         if not sel: return
         p_id = self.tree_cart.item(sel)['values'][0]
-        self.cart = [c for c in self.cart if c['id'] != p_id]
+        self.order_service.remove_from_cart(p_id)
         self.update_cart_ui()
 
     def clear_cart(self):
-        self.cart = []
+        self.order_service.clear_cart()
         self.update_cart_ui()
 
     def update_cart_ui(self):
         for i in self.tree_cart.get_children(): self.tree_cart.delete(i)
-        self.cart_total = 0
-        for c in self.cart:
-            self.cart_total += c['total']
-            price_fmt = "{:,.0f}".format(c['total'])
-            self.tree_cart.insert("", "end", values=(c['id'], c['name'], c['qty'], price_fmt))
         
-        self.lbl_preview_total.configure(text=f"Tạm tính: {self.cart_total:,.0f} VNĐ")
+        cart = self.order_service.get_cart()
+        for c in cart.items.values():
+            price_fmt = "{:,.0f}".format(c.total)
+            self.tree_cart.insert("", "end", values=(c.product_id, c.name, c.qty, price_fmt))
+        
+        self.lbl_preview_total.configure(text=f"Tạm tính: {cart.cart_total:,.0f} VNĐ")
 
-    # --- POPUP THANH TOÁN (UI MỚI) ---
     def open_checkout_dialog(self):
-        if not self.cart:
+        cart = self.order_service.get_cart()
+        if not cart.items:
             messagebox.showwarning("Giỏ hàng trống", "Vui lòng chọn sản phẩm trước!")
             return
 
@@ -206,9 +180,6 @@ class PosTab(ctk.CTkFrame): # Kế thừa CTkFrame
         self.checkout_win.title("Thanh Toán Đơn Hàng")
         self.checkout_win.geometry("500x680")
         self.checkout_win.grab_set()
-        
-        self.discount_amount = 0
-        self.final_total = self.cart_total
 
         # Header
         header = ctk.CTkFrame(self.checkout_win, fg_color="#00b894", height=60, corner_radius=0)
@@ -245,15 +216,15 @@ class PosTab(ctk.CTkFrame): # Kế thừa CTkFrame
         inner_sum = ctk.CTkFrame(summary_frame, fg_color="transparent")
         inner_sum.pack(fill="x", padx=20, pady=20)
 
-        self.lbl_chk_subtotal = ctk.CTkLabel(inner_sum, text=f"Tiền hàng: {self.cart_total:,.0f} VNĐ", anchor="e")
+        self.lbl_chk_subtotal = ctk.CTkLabel(inner_sum, text=f"Tiền hàng: {cart.cart_total:,.0f} VNĐ", anchor="e")
         self.lbl_chk_subtotal.pack(fill="x")
         
-        self.lbl_chk_discount = ctk.CTkLabel(inner_sum, text="Giảm giá: 0 VNĐ", text_color="red", anchor="e")
+        self.lbl_chk_discount = ctk.CTkLabel(inner_sum, text=f"Giảm giá: -{cart.discount_amount:,.0f} VNĐ", text_color="red", anchor="e")
         self.lbl_chk_discount.pack(fill="x")
         
         ctk.CTkFrame(inner_sum, height=2, fg_color="gray").pack(fill="x", pady=10)
         
-        self.lbl_chk_final = ctk.CTkLabel(inner_sum, text=f"{self.cart_total:,.0f} VNĐ", 
+        self.lbl_chk_final = ctk.CTkLabel(inner_sum, text=f"{cart.final_total:,.0f} VNĐ", 
                                           text_color=("#2d3436", "white"), font=("Arial", 24, "bold"), anchor="e")
         self.lbl_chk_final.pack(fill="x")
 
@@ -265,35 +236,28 @@ class PosTab(ctk.CTkFrame): # Kế thừa CTkFrame
         ToolTip(btn_confirm, "Hoàn tất thanh toán và in hóa đơn")
 
     def apply_voucher_logic(self):
-        code = self.entry_checkout_voucher.get().strip().upper()
-        if not code: return
+        code = self.entry_checkout_voucher.get().strip()
+        success, msg = self.order_service.apply_voucher(code)
         
-        is_valid, result = self.promotion_service.check_promotion(code, self.cart_total)
-        
-        if is_valid:
-            self.current_applied_voucher = code
-            self.discount_amount = result
-            messagebox.showinfo("Thành công", f"Đã áp dụng mã {code}!\nGiảm: {result:,.0f} đ")
+        if success:
+            messagebox.showinfo("Thành công", f"Đã áp dụng mã {code}!\nGiảm: {msg:,.0f} đ")
         else:
-            self.discount_amount = 0
-            messagebox.showerror("Lỗi", result)
+            messagebox.showerror("Lỗi", msg)
         
         # Cập nhật UI
-        self.final_total = max(0, self.cart_total - self.discount_amount)
-        self.lbl_chk_discount.configure(text=f"Giảm giá: -{self.discount_amount:,.0f} VNĐ")
-        self.lbl_chk_final.configure(text=f"{self.final_total:,.0f} VNĐ")
+        cart = self.order_service.get_cart()
+        self.lbl_chk_discount.configure(text=f"Giảm giá: -{cart.discount_amount:,.0f} VNĐ")
+        self.lbl_chk_final.configure(text=f"{cart.final_total:,.0f} VNĐ")
 
     def process_final_payment(self):
         phone = self.entry_checkout_phone.get()
-        voucher_code = self.current_applied_voucher if self.current_applied_voucher else ""
+        # Trong hệ thống này, không có bảng customer riêng biệt lúc checkout, 
+        # customer_id có thể truyền None hoặc lấy ID khách hàng.
+        cart_snapshot = self.order_service.get_cart().get_items_as_dict_list()
+        final_total = self.order_service.get_cart().final_total
 
         if messagebox.askyesno("Xác nhận", "Hoàn tất giao dịch này?"):
-            success, msg = self.order_service.create_order(
-                self.current_user_id, 
-                voucher_code,
-                self.final_total, 
-                self.cart
-            )
+            success, msg = self.order_service.checkout(self.current_user_id)
             
             if success:
                 try: 
@@ -305,10 +269,10 @@ class PosTab(ctk.CTkFrame): # Kế thừa CTkFrame
                     f_path = filedialog.asksaveasfilename(defaultextension=".pdf", initialfile=f"Bill_{order_id}.pdf")
                     if f_path:
                         c_name = f"SĐT: {phone}" if phone else "Khách vãng lai"
-                        self.exporter.print_invoice_pdf(order_id, c_name, self.cart, self.final_total, f_path)
+                        self.exporter.print_invoice_pdf(order_id, c_name, cart_snapshot, final_total, f_path)
                 
                 self.checkout_win.destroy()
-                self.clear_cart()
+                self.update_cart_ui()
                 self.load_products() 
                 messagebox.showinfo("Hoàn tất", "Giao dịch thành công!")
             else:

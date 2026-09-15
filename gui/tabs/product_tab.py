@@ -292,11 +292,11 @@ class ProductTab(ctk.CTkFrame): # Kế thừa CTkFrame
             self.reload_data()
 
     def export_excel(self):
-        # [LOGIC GIỮ NGUYÊN]
         file_path = filedialog.asksaveasfilename(defaultextension=".xlsx", 
                                                  filetypes=[("Excel files", "*.xlsx")])
         if file_path:
-            success, msg = self.exporter.export_inventory_to_excel(file_path)
+            products_data = self.product_service.get_all_products()
+            success, msg = self.exporter.export_inventory_to_excel(products_data, file_path)
             if success:
                 messagebox.showinfo("Thành công", f"Đã xuất file tại:\n{file_path}")
             else:

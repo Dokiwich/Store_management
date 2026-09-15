@@ -27,8 +27,8 @@ STORE_HOTLINE = "Hotline: 1900 1000"
 
 
 class Exporter:
-    def __init__(self, db_manager):
-        self.db_manager = db_manager
+    def __init__(self):
+        pass
 
     def print_invoice_pdf(self, order_id, customer_name, cart_items, total_amount, filepath):
         """Xuất hóa đơn PDF chuẩn với font tiếng Việt và phân trang tự động."""
@@ -143,13 +143,20 @@ class Exporter:
         except Exception as e:
             return False, f"Lỗi xuất PDF: {type(e).__name__}"
 
-    def export_inventory_to_excel(self, filepath):
-        """Xuất danh sách sản phẩm ra file Excel."""
+    def export_inventory_to_excel(self, products_data, filepath):
+        """Xuất danh sách sản phẩm ra file Excel từ dữ liệu được cung cấp (Tôn trọng Encapsulation)."""
         try:
-            conn = self.db_manager.get_connection()
-            query = "SELECT id, name, category, brand, price, stock_quantity, spec_cpu, spec_ram, spec_hard_drive, spec_screen FROM products WHERE is_active = 1"
-            df = pd.read_sql(query, conn)
+            if not products_data:
+                return False, "Không có dữ liệu để xuất"
+                
+            # Đảm bảo columns khớp với thứ tự của list tuple truyền vào từ ProductService.get_all_products()
+            # Giả sử tuple: (id, category, name, brand, supplier_id, import_price, price, stock, cpu, ram, screen, hard_drive, gpu, weight, os, description, is_active)
+            df = pd.DataFrame(products_data)
+            # Lọc các cột cần thiết (chỉ số 0, 2, 1, 3, 6, 7, 8, 9, 11, 10) để khớp với code cũ
+            # Old query: id, name, category, brand, price, stock_quantity, spec_cpu, spec_ram, spec_hard_drive, spec_screen
+            df = df[[0, 2, 1, 3, 6, 7, 8, 9, 11, 10]]
             df.columns = ['ID', 'Tên SP', 'Loại', 'Hãng', 'Giá bán', 'Tồn kho', 'CPU', 'RAM', 'Ổ cứng', 'Màn hình']
+            
             df.to_excel(filepath, index=False, engine='openpyxl')
             return True, f"Xuất Excel thành công: {filepath}"
         except Exception as e:

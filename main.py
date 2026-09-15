@@ -44,16 +44,16 @@ def main():
     
     # 3. Khởi tạo toàn bộ Service (Business Logic)
     product_service = ProductService(product_dao)
-    order_service = OrderService(order_dao)
+    promotion_service = PromotionService(promotion_dao)
+    order_service = OrderService(order_dao, promotion_service, product_service)
     report_service = ReportService(report_dao)
     customer_service = CustomerService(customer_dao)
     warranty_service = WarrantyService(warranty_dao)
     user_service = UserService(user_dao)
-    promotion_service = PromotionService(promotion_dao)
     history_service = HistoryService(history_dao)
     supplier_service = SupplierService(supplier_dao)
     
-    exporter = Exporter(db_manager)
+    exporter = Exporter()
 
     # Biến trạng thái để kiểm soát vòng lặp ứng dụng
     app_state = {
