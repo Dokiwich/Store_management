@@ -81,11 +81,21 @@ def main():
                 app_state["user"] = None
                 app_state["action"] = "login" # Quay lại đăng nhập
 
-            app = MainWindow(db_manager, product_service, order_service, report_service, 
-                             customer_service, warranty_service, exporter, promotion_service, 
-                             history_service, user_service, supplier_service, app_state["user"], 
-                             on_logout) # Truyền callback logout
-            
+            app = MainWindow(
+                current_user=app_state["user"],
+                on_logout=on_logout,
+                db_manager=db_manager,
+                product_service=product_service,
+                order_service=order_service,
+                report_service=report_service,
+                customer_service=customer_service,
+                warranty_service=warranty_service,
+                supplier_service=supplier_service,
+                user_service=user_service,
+                exporter=exporter,
+                history_service=history_service,
+                promotion_service=promotion_service
+            )
             app.mainloop()
 
             # Nếu tắt main window bằng dấu X -> Thoát vòng lặp

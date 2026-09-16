@@ -43,25 +43,29 @@ class OrderDAO:
                 p_id = item['id']
                 qty = item['qty']
 
-                # Trừ số lượng tồn kho
-                cursor.execute(
-                    "UPDATE products SET stock_quantity = stock_quantity - %s WHERE id = %s AND stock_quantity >= %s",
-                    (qty, p_id, qty)
-                )
-                if cursor.rowcount == 0:
-                    conn.rollback()
-                    return False, f"Sản phẩm ID {p_id} hết hàng hoặc không đủ số lượng"
-
-                # Verify price from DB
-                cursor.execute("SELECT price FROM products WHERE id = %s", (p_id,))
-                db_price_row = cursor.fetchone()
-                if db_price_row:
-                    verified_price = db_price_row[0]
-                else:
+                # 1. Khóa dòng sản phẩm và lấy giá, tồn kho hiện tại (Pessimistic Locking)
+                cursor.execute("SELECT price, stock_quantity FROM products WHERE id = %s FOR UPDATE", (p_id,))
+                db_row = cursor.fetchone()
+                
+                if not db_row:
                     conn.rollback()
                     return False, f"Không tìm thấy sản phẩm ID {p_id}"
+                
+                verified_price = db_row[0]
+                current_stock = db_row[1]
+                
+                # 2. Kiểm tra tồn kho
+                if current_stock < qty:
+                    conn.rollback()
+                    return False, f"Sản phẩm ID {p_id} không đủ số lượng (Chỉ còn {current_stock})"
 
-                # Lưu chi tiết đơn hàng
+                # 3. Trừ số lượng tồn kho an toàn
+                cursor.execute(
+                    "UPDATE products SET stock_quantity = stock_quantity - %s WHERE id = %s",
+                    (qty, p_id)
+                )
+
+                # 4. Lưu chi tiết đơn hàng
                 cursor.execute(sql_detail, (order_id, p_id, qty, verified_price))
 
             # 4. Lưu tất cả thay đổi (Commit)
