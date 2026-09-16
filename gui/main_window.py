@@ -18,8 +18,8 @@ from gui.tabs.employee_tab import EmployeeTab
 ctk.set_appearance_mode("System") 
 ctk.set_default_color_theme("blue")
 
-class MainWindow(ctk.CTk): # Kế thừa từ CTk thay vì tk.Tk
-    def __init__(self, current_user, on_logout, db_manager, product_service, order_service, report_service, customer_service, warranty_service, supplier_service, user_service, exporter, history_service, promotion_service):
+class MainWindow(ctk.CTk):
+    def __init__(self, current_user, on_logout, service_container):
         super().__init__()
         
         # --- LOGIC GIỮ NGUYÊN ---
@@ -43,18 +43,18 @@ class MainWindow(ctk.CTk): # Kế thừa từ CTk thay vì tk.Tk
         
         self.is_dark_mode = False
 
-        # Lưu các Logic
-        self.db_manager = db_manager
-        self.product_service = product_service
-        self.order_service = order_service
-        self.report_service = report_service
-        self.customer_service = customer_service
-        self.warranty_service = warranty_service
-        self.exporter = exporter
-        self.history_service = history_service
-        self.user_service = user_service
-        self.promotion_service = promotion_service
-        self.supplier_service = supplier_service
+        # Giải nén các logic từ container
+        self.db_manager = service_container.db_manager
+        self.product_service = service_container.product_service
+        self.order_service = service_container.order_service
+        self.report_service = service_container.report_service
+        self.customer_service = service_container.customer_service
+        self.warranty_service = service_container.warranty_service
+        self.exporter = service_container.exporter
+        self.history_service = service_container.history_service
+        self.user_service = service_container.user_service
+        self.promotion_service = service_container.promotion_service
+        self.supplier_service = service_container.supplier_service
 
         self.menu_buttons = []
         self.current_btn = None

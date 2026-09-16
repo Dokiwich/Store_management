@@ -69,3 +69,7 @@ class OrderService:
             self.clear_cart()
             
         return success, msg
+
+    def create_order(self, user_id, voucher_code, total_amount, cart_items, customer_id=None):
+        """Pass-through function cho home_tab.py tự quản lý giỏ hàng."""
+        return self.dao.create_order(user_id, voucher_code, total_amount, cart_items, customer_id)

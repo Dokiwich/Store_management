@@ -85,6 +85,34 @@ class ProductDAO:
                 cursor.close()
         return False
 
+    def update_product(self, p_id, name, category, brand, supplier_id, import_price, price, stock, 
+                       cpu, ram, screen, hard_drive, gpu, weight, os_sys, description):
+        conn = self.db_manager.get_connection()
+        if conn:
+            cursor = conn.cursor()
+            try:
+                cat_id = self._get_or_create_category(cursor, category)
+                brand_id = self._get_or_create_brand(cursor, brand)
+
+                query = """
+                    UPDATE products 
+                    SET name=%s, category_id=%s, brand_id=%s, supplier_id=%s, import_price=%s, price=%s, stock_quantity=%s, 
+                        spec_cpu=%s, spec_ram=%s, spec_screen=%s, spec_hard_drive=%s, spec_gpu=%s, spec_weight=%s, spec_os=%s, 
+                        description=%s
+                    WHERE id=%s
+                """
+                cursor.execute(query, (name, cat_id, brand_id, supplier_id, import_price, price, stock, 
+                                       cpu, ram, screen, hard_drive, gpu, weight, os_sys, description, p_id))
+                conn.commit()
+                return True
+            except Exception as e:
+                print(f"Lỗi update_product: {e}")
+                conn.rollback()
+                return False
+            finally:
+                cursor.close()
+        return False
+
     def delete_product(self, p_id):
         conn = self.db_manager.get_connection()
         if conn:

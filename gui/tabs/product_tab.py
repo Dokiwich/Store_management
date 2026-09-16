@@ -24,7 +24,7 @@ class ProductTab(ctk.CTkFrame): # Kế thừa CTkFrame
 
         # Các Nút Thao Tác
         if self.current_user['role'] == 'admin':
-            self.btn_add = self.create_sidebar_button("➕ Thêm Laptop", "#00b894", "#00a884", self.open_add_popup)
+            self.btn_add = self.create_sidebar_button("➕ Thêm Laptop", "#00b894", "#00a884", self.open_add_dialog)
             self.btn_edit = self.create_sidebar_button("✏️ Cập Nhật", "#fdcb6e", "#e1b12c", self.open_edit_popup)
             self.btn_del = self.create_sidebar_button("🗑️ Xóa Laptop", "#ff7675", "#d63031", self.delete_product)
             ToolTip(self.btn_add, "Thêm sản phẩm mới vào kho")
@@ -273,6 +273,90 @@ class ProductTab(ctk.CTkFrame): # Kế thừa CTkFrame
                 self.top.destroy()
             else:
                 messagebox.showerror("Lỗi", "Không thể thêm vào CSDL", parent=self.top)
+        except ValueError:
+            messagebox.showerror("Lỗi", "Giá và số lượng phải là số hợp lệ", parent=self.top)
+
+    def open_edit_popup(self):
+        selected = self.tree.selection()
+        if not selected:
+            messagebox.showwarning("Cảnh báo", "Vui lòng chọn sản phẩm cần sửa")
+            return
+        
+        item = self.tree.item(selected)
+        p_id = item['values'][0]
+        product = self.product_service.get_product_by_id(p_id)
+        if not product:
+            return
+            
+        self.open_add_dialog()
+        self.top.title("Cập Nhật Laptop")
+        
+        # Điền dữ liệu cũ
+        self.entry_name.insert(0, product[2])
+        self.cmb_cat.set(product[3])
+        self.cmb_brand.set(product[4])
+        
+        sup_id = product[1]
+        if sup_id:
+            for name, sid in self.sup_map.items():
+                if sid == sup_id:
+                    self.cb_sup.set(name)
+                    break
+                    
+        self.entry_import.insert(0, str(product[5]))
+        self.entry_price.insert(0, str(product[6]))
+        self.entry_stock.insert(0, str(product[7]))
+        
+        self.entry_cpu.insert(0, product[8] or "")
+        self.entry_ram.insert(0, product[9] or "")
+        try:
+            self.entry_screen.insert(0, product[10] or "")
+            self.entry_hdd.insert(0, product[11] or "")
+            self.entry_gpu.insert(0, product[12] or "")
+            self.entry_weight.insert(0, product[13] or "")
+            self.entry_os.insert(0, product[14] or "")
+            self.entry_desc.insert(0, product[15] or "")
+        except IndexError:
+            pass
+
+        # Ghi đè nút Lưu
+        for widget in self.form_frame.winfo_children():
+            if isinstance(widget, ctk.CTkButton) and widget.cget("text") == "LƯU SẢN PHẨM":
+                widget.configure(text="CẬP NHẬT SẢN PHẨM", command=lambda: self.update_product(p_id))
+                break
+
+    def update_product(self, p_id):
+        try:
+            name = self.entry_name.get()
+            category = self.cmb_cat.get()
+            brand = self.cmb_brand.get()
+            im_price = float(self.entry_import.get() or 0) 
+            price = float(self.entry_price.get())
+            stock = int(self.entry_stock.get() or 0)
+            
+            sup_id = self.sup_map.get(self.cb_sup.get(), None)
+
+            cpu = self.entry_cpu.get()
+            ram = self.entry_ram.get()
+            screen = self.entry_screen.get()
+            hdd = self.entry_hdd.get()
+            gpu = self.entry_gpu.get()
+            weight = self.entry_weight.get()
+            os_sys = self.entry_os.get()
+            desc = self.entry_desc.get()
+
+            if not name:
+                messagebox.showwarning("Lỗi", "Tên không được để trống", parent=self.top)
+                return
+
+            success = self.product_service.update_product(p_id, name, category, brand, sup_id, im_price, price, stock,
+                                                   cpu, ram, screen, hdd, gpu, weight, os_sys, desc)
+            if success:
+                messagebox.showinfo("Thành công", "Đã cập nhật sản phẩm", parent=self.top)
+                self.reload_data()
+                self.top.destroy()
+            else:
+                messagebox.showerror("Lỗi", "Không thể cập nhật vào CSDL", parent=self.top)
         except ValueError:
             messagebox.showerror("Lỗi", "Giá và số lượng phải là số hợp lệ", parent=self.top)
 

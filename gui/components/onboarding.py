@@ -59,46 +59,53 @@ class GuidedTour:
         step = self.steps[self.current_step]
         widget = step['widget']
 
-        # Overlay bán trong suốt
-        self.overlay = ctk.CTkFrame(self.parent, fg_color="black")
-        self.overlay.place(relx=0, rely=0, relwidth=1, relheight=1)
-        self.overlay.configure(fg_color=("gray20", "gray20"))
-        # Cho overlay mờ bằng cách dùng opacity thấp
-        self.overlay.bind("<Button-1>", lambda e: None)  # Block clicks
+        # Overlay Toplevel để tạo hiệu ứng Spotlight (Chỉ làm mờ nền, khoét lỗ vùng chọn)
+        self.overlay = ctk.CTkToplevel(self.parent)
+        self.overlay.overrideredirect(True)
+        self.overlay.attributes('-alpha', 0.7) # Độ mờ 70%
+        self.overlay.attributes('-topmost', True)
+        
+        # Kỹ thuật đục lỗ (Transparent Color) trên Windows
+        transparent_color = "magenta"
+        try:
+            self.overlay.attributes('-transparentcolor', transparent_color)
+        except Exception:
+            pass # Bỏ qua nếu chạy trên Mac/Linux không hỗ trợ
+
+        # Phủ toàn bộ màn hình chính
+        root_x = self.parent.winfo_rootx()
+        root_y = self.parent.winfo_rooty()
+        root_w = self.parent.winfo_width()
+        root_h = self.parent.winfo_height()
+        self.overlay.geometry(f"{root_w}x{root_h}+{root_x}+{root_y}")
+
+        import tkinter as tk # Đảm bảo import
+        self.canvas = tk.Canvas(self.overlay, bg="black", highlightthickness=0)
+        self.canvas.pack(fill="both", expand=True)
 
         self.parent.update_idletasks()
 
-        # Highlight widget nếu có
+        # Highlight widget nếu có bằng cách khoét lỗ
         if widget and widget.winfo_exists():
             try:
-                # Tính vị trí tương đối trong parent
-                wx = widget.winfo_rootx() - self.parent.winfo_rootx()
-                wy = widget.winfo_rooty() - self.parent.winfo_rooty()
+                # Tính vị trí tuyệt đối của widget so với main window
+                wx = widget.winfo_rootx() - root_x
+                wy = widget.winfo_rooty() - root_y
                 ww = widget.winfo_width()
                 wh = widget.winfo_height()
 
-                # Border highlight
-                pad = 4
-                self.highlight_border = ctk.CTkFrame(
-                    self.parent,
-                    fg_color="transparent",
-                    border_color="#00d4ff",
-                    border_width=3,
-                    corner_radius=8
+                pad = 5
+                # Đục lỗ trong suốt tại vị trí widget
+                self.canvas.create_rectangle(
+                    wx - pad, wy - pad, 
+                    wx + ww + pad, wy + wh + pad, 
+                    fill=transparent_color, outline="#00d4ff", width=4
                 )
-                self.highlight_border.place(
-                    x=wx - pad, y=wy - pad,
-                    width=ww + 2 * pad, height=wh + 2 * pad
-                )
-                self.highlight_border.lift()
-
-                # Nâng widget lên trên overlay
-                widget.lift()
             except Exception:
                 wx, wy, ww, wh = 0, 0, 0, 0
         else:
-            wx = self.parent.winfo_width() // 2 - 175
-            wy = self.parent.winfo_height() // 2 - 100
+            wx = root_w // 2 - 175
+            wy = root_h // 2 - 100
             ww, wh = 0, 0
 
         # Card hướng dẫn

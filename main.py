@@ -42,18 +42,22 @@ def main():
     history_dao = HistoryDAO(db_manager)
     supplier_dao = SupplierDAO(db_manager)
     
-    # 3. Khởi tạo toàn bộ Service (Business Logic)
-    product_service = ProductService(product_dao)
-    promotion_service = PromotionService(promotion_dao)
-    order_service = OrderService(order_dao, promotion_service, product_service)
-    report_service = ReportService(report_dao)
-    customer_service = CustomerService(customer_dao)
-    warranty_service = WarrantyService(warranty_dao)
-    user_service = UserService(user_dao)
-    history_service = HistoryService(history_dao)
-    supplier_service = SupplierService(supplier_dao)
+    # 3. Đóng gói vào Service Container (Dependency Injection)
+    from logic.service_container import ServiceContainer
+    container = ServiceContainer()
+    container.db_manager = db_manager
+    container.exporter = Exporter()
     
-    exporter = Exporter()
+    # Khởi tạo Service và nhét vào Container
+    container.product_service = ProductService(product_dao)
+    container.promotion_service = PromotionService(promotion_dao)
+    container.order_service = OrderService(order_dao, container.promotion_service, container.product_service)
+    container.report_service = ReportService(report_dao)
+    container.customer_service = CustomerService(customer_dao)
+    container.warranty_service = WarrantyService(warranty_dao)
+    container.user_service = UserService(user_dao)
+    container.history_service = HistoryService(history_dao)
+    container.supplier_service = SupplierService(supplier_dao)
 
     # Biến trạng thái để kiểm soát vòng lặp ứng dụng
     app_state = {
@@ -68,7 +72,7 @@ def main():
                 app_state["user"] = user_info
                 app_state["action"] = "main" # Chuyển sang màn hình chính
 
-            login_app = LoginWindow(user_service, on_login_success)
+            login_app = LoginWindow(container.user_service, on_login_success)
             login_app.mainloop()
             
             # Nếu tắt login mà chưa đăng nhập -> Thoát luôn
@@ -84,17 +88,8 @@ def main():
             app = MainWindow(
                 current_user=app_state["user"],
                 on_logout=on_logout,
-                db_manager=db_manager,
-                product_service=product_service,
-                order_service=order_service,
-                report_service=report_service,
-                customer_service=customer_service,
-                warranty_service=warranty_service,
-                supplier_service=supplier_service,
-                user_service=user_service,
-                exporter=exporter,
-                history_service=history_service,
-                promotion_service=promotion_service
+                
+                service_container=container
             )
             app.mainloop()
 
