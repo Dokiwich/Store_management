@@ -21,3 +21,18 @@ class CustomerService:
         if email and not re.match(r'^[\w.+-]+@[\w-]+\.[\w.]+$', email):
             return False, "Email không hợp lệ"
         return self.dao.add_customer(name, phone, email, address)
+
+    def get_or_create_customer_by_phone(self, phone):
+        if not phone:
+            return None
+        customer = self.dao.get_customer_by_phone(phone)
+        if customer:
+            return customer[0] # Trả về ID
+        
+        # Nếu chưa có, tự động tạo khách vãng lai
+        success, msg = self.dao.add_customer("Khách vãng lai", phone, "", "")
+        if success:
+            new_cust = self.dao.get_customer_by_phone(phone)
+            if new_cust:
+                return new_cust[0]
+        return None

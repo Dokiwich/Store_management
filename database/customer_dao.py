@@ -25,6 +25,17 @@ class CustomerDAO:
                 cursor.close()
         return 0
 
+    def get_customer_by_phone(self, phone):
+        conn = self.db_manager.get_connection()
+        if conn:
+            cursor = conn.cursor()
+            try:
+                cursor.execute("SELECT * FROM customers WHERE phone = %s", (phone,))
+                return cursor.fetchone()
+            finally:
+                cursor.close()
+        return None
+
     def add_customer(self, name, phone, email, address):
         conn = self.db_manager.get_connection()
         if conn:

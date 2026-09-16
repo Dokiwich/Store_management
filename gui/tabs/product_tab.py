@@ -193,8 +193,9 @@ class ProductTab(ctk.CTkFrame): # Kế thừa CTkFrame
         f_brand = ctk.CTkFrame(row2, fg_color="transparent")
         f_brand.pack(side="left", fill="x", expand=True)
         ctk.CTkLabel(f_brand, text="Hãng:", font=("Arial", 12, "bold")).pack(anchor="w")
-        self.cmb_brand = ctk.CTkComboBox(f_brand, values=["Dell", "Asus", "HP", "Apple", "Lenovo", "Acer", "MSI", "LG"])
+        self.cmb_brand = ctk.CTkComboBox(f_brand, values=["", "Khác", "Dell", "Asus", "HP", "Apple", "Lenovo", "Acer", "MSI", "LG"])
         self.cmb_brand.pack(fill="x", pady=5)
+        self.cmb_brand.set("") # Mặc định để trống
 
         # Nhà Cung Cấp
         ctk.CTkLabel(self.form_frame, text="Nhà Cung Cấp:", text_color="#0984e3", font=("Arial", 12, "bold")).pack(anchor="w", pady=(10, 0))
@@ -401,7 +402,7 @@ class ProductTab(ctk.CTkFrame): # Kế thừa CTkFrame
         top.geometry("450x650")
         top.grab_set()
         
-        ctk.CTkLabel(top, text=product[1], font=("Segoe UI", 18, "bold"), wraplength=400).pack(pady=15)
+        ctk.CTkLabel(top, text=product[2], font=("Segoe UI", 18, "bold"), wraplength=400).pack(pady=15)
         
         info_frame = ctk.CTkFrame(top, fg_color="transparent")
         info_frame.pack(fill="both", expand=True, padx=20)
@@ -419,13 +420,14 @@ class ProductTab(ctk.CTkFrame): # Kế thừa CTkFrame
             # Kẻ đường mờ
             ctk.CTkFrame(info_frame, height=1, fg_color="gray80").pack(fill="x", pady=2)
 
-        add_row("Danh mục:", product[2])
-        add_row("Hãng:", product[3])
+        add_row("Danh mục:", product[3])
+        add_row("Hãng:", product[4])
         add_row("CPU:", product[8]) 
         add_row("RAM:", product[9]) 
         
         try:
-            add_row("Màn hình:", product[11])
+            add_row("Màn hình:", product[10])
+            add_row("Ổ cứng:", product[11])
             add_row("VGA:", product[12])
         except IndexError: pass
 

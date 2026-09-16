@@ -20,10 +20,10 @@ class WarrantyDAO:
                         od.price_at_sale,
                         o.created_at
                     FROM orders o
-                    JOIN customers c ON o.customer_id = c.id
+                    LEFT JOIN customers c ON o.customer_id = c.id
                     JOIN order_details od ON o.id = od.order_id
                     JOIN products p ON od.product_id = p.id
-                    WHERE c.phone LIKE %s OR o.id LIKE %s
+                    WHERE (c.phone LIKE %s OR o.id LIKE %s)
                     ORDER BY o.created_at DESC LIMIT %s
                 """
                 # Tìm gần đúng (%)

@@ -4,12 +4,13 @@ import customtkinter as ctk
 from gui.components.tooltip import ToolTip
 
 class PosTab(ctk.CTkFrame): # Kế thừa CTkFrame
-    def __init__(self, parent, product_service, order_service, promotion_service, exporter, current_user):
+    def __init__(self, parent, product_service, order_service, promotion_service, exporter, current_user, customer_service=None):
         super().__init__(parent, fg_color="transparent")
         self.product_service = product_service
         self.order_service = order_service
         self.promotion_service = promotion_service 
         self.exporter = exporter
+        self.customer_service = customer_service
         
         self.current_applied_voucher = None
         self.current_user_id = current_user['id'] if current_user else 1
@@ -250,14 +251,20 @@ class PosTab(ctk.CTkFrame): # Kế thừa CTkFrame
         self.lbl_chk_final.configure(text=f"{cart.final_total:,.0f} VNĐ")
 
     def process_final_payment(self):
-        phone = self.entry_checkout_phone.get()
-        # Trong hệ thống này, không có bảng customer riêng biệt lúc checkout, 
-        # customer_id có thể truyền None hoặc lấy ID khách hàng.
+        phone = self.entry_checkout_phone.get().strip()
+        if not phone:
+            messagebox.showwarning("Thiếu thông tin", "Vui lòng nhập số điện thoại khách hàng!", parent=self.checkout_win)
+            return
+            
+        customer_id = None
+        if self.customer_service:
+            customer_id = self.customer_service.get_or_create_customer_by_phone(phone)
+            
         cart_snapshot = self.order_service.get_cart().get_items_as_dict_list()
         final_total = self.order_service.get_cart().final_total
 
         if messagebox.askyesno("Xác nhận", "Hoàn tất giao dịch này?"):
-            success, msg = self.order_service.checkout(self.current_user_id)
+            success, msg = self.order_service.checkout(self.current_user_id, customer_id)
             
             if success:
                 try: 

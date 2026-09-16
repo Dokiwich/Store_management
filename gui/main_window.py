@@ -284,7 +284,7 @@ class MainWindow(ctk.CTk):
     def show_pos_tab(self, product_id_to_add=None):
         self.clear_content()
         if "pos" not in self.cached_tabs:
-            pos = PosTab(self.content_area, self.product_service, self.order_service, self.promotion_service, self.exporter, self.current_user)
+            pos = PosTab(self.content_area, self.product_service, self.order_service, self.promotion_service, self.exporter, self.current_user, self.customer_service)
             self.cached_tabs["pos"] = pos
         else:
             pos = self.cached_tabs["pos"]
@@ -331,8 +331,6 @@ class MainWindow(ctk.CTk):
         self.clear_content()
         if "warranty" not in self.cached_tabs:
             self.cached_tabs["warranty"] = WarrantyTab(self.content_area, self.warranty_service)
-        else:
-            self.cached_tabs["warranty"].do_search()
         self.cached_tabs["warranty"].pack(fill="both", expand=True)
 
     def show_employee_tab(self):
