@@ -19,6 +19,7 @@ class UserDAO:
                 user = cursor.fetchone()
             finally:
                 cursor.close()
+                if conn: conn.close()
             
             if user:
                 # 2. Lấy mật khẩu đã mã hóa từ DB
@@ -54,19 +55,22 @@ class UserDAO:
                 conn.commit()
                 return True, "Thêm thành công!"
             except mysql.connector.Error as err:
+                conn.rollback()
                 return False, f"Lỗi Database: {err}"
             except Exception as e:
+                conn.rollback()
                 return False, str(e)
             finally:
                 cursor.close()
+                if conn: conn.close()
         return False, "Lỗi kết nối"
 
-    def delete_user(self, user_id):
+    def toggle_user_status(self, user_id):
         conn = self.db_manager.get_connection()
         if conn:
             cursor = conn.cursor()
             try:
-                sql = "UPDATE users SET is_active = 0 WHERE id = %s"
+                sql = "UPDATE users SET is_active = 1 - is_active WHERE id = %s"
                 cursor.execute(sql, (user_id,))
                 conn.commit()
                 return True
@@ -75,6 +79,7 @@ class UserDAO:
                 return False
             finally:
                 cursor.close()
+                if conn: conn.close()
         return False
 
     def get_all_users(self):
@@ -87,6 +92,7 @@ class UserDAO:
                 return cursor.fetchall()
             finally:
                 cursor.close()
+                if conn: conn.close()
         return []
 
     # Hàm phụ trợ: Cập nhật hash cho tài khoản cũ (Tự động chạy khi login lần đầu)
@@ -103,3 +109,4 @@ class UserDAO:
                 print(f"Lỗi nâng cấp bảo mật: {e}")
             finally:
                 cursor.close()
+                if conn: conn.close()

@@ -45,7 +45,7 @@ class HomeTab(ctk.CTkFrame):
         header.pack(fill="x", padx=30, pady=10)
         
         # 1. Nút Giỏ hàng (Bên phải cùng)
-        self.btn_cart = ctk.CTkButton(header, text="🛒 Giỏ hàng (0)", 
+        self.btn_cart = ctk.CTkButton(header, text="Giỏ hàng (0)", 
                                       fg_color="#d63031", hover_color="#c0392b",
                                       font=("Segoe UI", 13, "bold"), 
                                       height=35, corner_radius=15,
@@ -53,7 +53,7 @@ class HomeTab(ctk.CTkFrame):
         self.btn_cart.pack(side="right")
 
         # 2. [MỚI] Nút Chăm sóc khách hàng (Bên cạnh giỏ hàng)
-        btn_support = ctk.CTkButton(header, text="🎧 CSKH", 
+        btn_support = ctk.CTkButton(header, text="CSKH", 
                                     fg_color="#0984e3", hover_color="#00cec9",
                                     font=("Segoe UI", 13, "bold"),
                                     height=35, corner_radius=15, width=100,
@@ -69,7 +69,7 @@ class HomeTab(ctk.CTkFrame):
         top.grab_set() # Focus vào cửa sổ này
         
         # Header Popup
-        ctk.CTkLabel(top, text="👋 CHÚNG TÔI CÓ THỂ GIÚP GÌ CHO BẠN?", 
+        ctk.CTkLabel(top, text="CHÚNG TÔI CÓ THỂ GIÚP GÌ CHO BẠN?", 
                      font=("Segoe UI", 18, "bold"), text_color="#0984e3").pack(pady=20)
 
         # Container chứa 3 nút dịch vụ
@@ -82,19 +82,19 @@ class HomeTab(ctk.CTkFrame):
         grid_frame.grid_columnconfigure(2, weight=1)
 
         # === 1. DỊCH VỤ VỆ SINH ===
-        btn_clean = self.create_service_card(grid_frame, "🧹\nDịch vụ Vệ Sinh", 
+        btn_clean = self.create_service_card(grid_frame, "Dịch Vụ Vệ Sinh", 
                                              "Làm sạch laptop,\ntra keo tản nhiệt", 
                                              "#00b894", 0, 
                                              lambda: self.show_branch_msg("Vệ Sinh Laptop"))
 
         # === 2. DỊCH VỤ PHẦN MỀM ===
-        btn_soft = self.create_service_card(grid_frame, "💿\nDịch vụ Phần Mềm", 
+        btn_soft = self.create_service_card(grid_frame, "Dịch Vụ Phần Mềm", 
                                             "Cài Office, Windows,\nDiệt Virus", 
                                             "#6c5ce7", 1, 
                                             self.show_software_popup)
 
         # === 3. ĐỔI TRẢ ===
-        btn_return = self.create_service_card(grid_frame, "🔄\nĐổi Trả / Bảo Hành", 
+        btn_return = self.create_service_card(grid_frame, "Đổi Trả / Bảo Hành", 
                                               "Đổi mới trong 30 ngày\nnếu lỗi NSX", 
                                               "#e17055", 2, 
                                               lambda: self.show_branch_msg("Đổi Trả & Bảo Hành"))
@@ -134,17 +134,17 @@ class HomeTab(ctk.CTkFrame):
         # Mục 1
         row1 = ctk.CTkFrame(content, fg_color="transparent")
         row1.pack(fill="x", pady=10, padx=10)
-        ctk.CTkLabel(row1, text="🟦 Microsoft Office 365/2021", font=("Arial", 12, "bold")).pack(anchor="w")
+        ctk.CTkLabel(row1, text="Microsoft Office 365/2021", font=("Arial", 12, "bold")).pack(anchor="w")
         ctk.CTkLabel(row1, text="   (Word, Excel, PowerPoint...)", font=("Arial", 11)).pack(anchor="w")
         
         # Mục 2
         row2 = ctk.CTkFrame(content, fg_color="transparent")
         row2.pack(fill="x", pady=10, padx=10)
-        ctk.CTkLabel(row2, text="🪟 Windows 10/11 Bản Quyền", font=("Arial", 12, "bold")).pack(anchor="w")
+        ctk.CTkLabel(row2, text="Windows 10/11 Bản Quyền", font=("Arial", 12, "bold")).pack(anchor="w")
         ctk.CTkLabel(row2, text="   (Home, Pro, Edu...)", font=("Arial", 11)).pack(anchor="w")
         
         # Nút liên hệ Admin
-        ctk.CTkButton(soft_win, text="📞 Liên hệ Admin để kích hoạt", 
+        ctk.CTkButton(soft_win, text="Liên hệ Quản Trị để kích hoạt", 
                       fg_color="#0984e3", font=("Segoe UI", 12, "bold"),
                       command=lambda: messagebox.showinfo("Liên hệ", "Vui lòng liên hệ Admin qua Zalo/SĐT: 099.999.9999 để được cài đặt từ xa (UltraView/TeamView).")).pack(pady=10)
 
@@ -158,15 +158,15 @@ class HomeTab(ctk.CTkFrame):
                                              font=("Montserrat", 24, "bold"))
         self.lbl_banner_title.place(x=30, y=20)
         
-        self.lbl_banner_promo = ctk.CTkLabel(self.banner, text="🔥 Ưu đãi cực sốc", 
+        self.lbl_banner_promo = ctk.CTkLabel(self.banner, text="Ưu đãi cực sốc", 
                                              text_color="#ffeaa7", font=("Segoe UI", 14, "bold"))
         self.lbl_banner_promo.place(x=30, y=65)
         
         # Thiết lập danh sách các banner để auto-rotate
         self.banner_slides = [
-            {"bg": "#6c5ce7", "title": "SĂN SALE ĐÓN TẾT!", "promo": "🔥 Giảm đến 50% các dòng Laptop Gaming"},
-            {"bg": "#0984e3", "title": "BACK TO SCHOOL", "promo": "🎓 Trợ giá HSSV - Tặng balo & chuột không dây"},
-            {"bg": "#d63031", "title": "FLASH SALE CUỐI TUẦN", "promo": "⚡ Mua 1 tặng 1 phụ kiện cao cấp"}
+            {"bg": "#6c5ce7", "title": "SĂN SALE ĐÓN TẾT!", "promo": "Giảm đến 50% các dòng Laptop Gaming"},
+            {"bg": "#0984e3", "title": "BACK TO SCHOOL", "promo": "Trợ giá HSSV - Tặng balo & chuột không dây"},
+            {"bg": "#d63031", "title": "FLASH SALE CUỐI TUẦN", "promo": "Mua 1 tặng 1 phụ kiện cao cấp"}
         ]
         self.current_slide = 0
         
@@ -230,12 +230,9 @@ class HomeTab(ctk.CTkFrame):
         categories = self.product_service.get_all_categories()
         
         # Nút Tất cả
-        self.create_category_icon("Tất cả", "🌐")
-        
-        icons = ["💻", "🎮", "💼", "🖥️", "🍎", "⚡"]
-        for i, cat in enumerate(categories):
-            icon = icons[i % len(icons)]
-            self.create_category_icon(cat, icon)
+        self.create_category_icon("Tất cả")
+        for cat in categories:
+            self.create_category_icon(cat)
 
     def scroll_categories(self, direction):
         # Truy cập vào canvas bên trong CTkScrollableFrame để cuộn ngang
@@ -244,14 +241,14 @@ class HomeTab(ctk.CTkFrame):
         except Exception:
             pass # Bỏ qua nếu lỗi thuộc tính
 
-    def create_category_icon(self, name, icon):
-        # Tạo một nút vuông trông giống icon Shopee
-        btn = ctk.CTkButton(self.cat_scroll, text=f"{icon}\n{name}", 
-                            width=100, height=80, fg_color="white", text_color="black",
+    def create_category_icon(self, name):
+        # Tạo nút phẳng danh mục gọn gàng
+        btn = ctk.CTkButton(self.cat_scroll, text=name, 
+                            width=100, height=45, fg_color="white", text_color="#1f2937",
                             hover_color="#e3f2fd", border_width=1, border_color="#dfe6e9",
-                            corner_radius=10, font=("Segoe UI", 13, "bold"),
+                            corner_radius=8, font=("Segoe UI", 12, "bold"),
                             command=lambda n=name: self.filter_by_category(n))
-        btn.pack(side="left", padx=10, pady=5)
+        btn.pack(side="left", padx=6, pady=5)
 
     def filter_by_category(self, cat_name):
         # Tự động cập nhật combobox và gọi hàm lọc
@@ -268,7 +265,7 @@ class HomeTab(ctk.CTkFrame):
         inner = ctk.CTkFrame(bar, fg_color="transparent")
         inner.pack(padx=15, pady=10, fill="x")
         
-        ctk.CTkLabel(inner, text="🔍 Tìm tên:", font=("Arial", 12)).pack(side="left", padx=(0, 5))
+        ctk.CTkLabel(inner, text="Tìm tên:", font=("Arial", 12)).pack(side="left", padx=(0, 5))
         
         self.entry_keyword = ctk.CTkEntry(inner, placeholder_text="Nhập tên laptop...", width=200)
         self.entry_keyword.pack(side="left", padx=(0, 15))
@@ -427,10 +424,10 @@ class HomeTab(ctk.CTkFrame):
         right = ctk.CTkFrame(body, fg_color="transparent")
         right.pack(side="right", fill="y", pady=10)
         ctk.CTkLabel(right, text="{:,.0f} VNĐ".format(product[6]), text_color="#d63031", font=("Arial", 26, "bold")).pack(pady=(20, 10))
-        status = f"✅ Còn hàng ({product[7]})" if product[7] > 0 else "❌ Hết hàng"
+        status = f"Còn hàng ({product[7]})" if product[7] > 0 else "Hết hàng"
         status_color = "#00b894" if product[7] > 0 else "red"
         ctk.CTkLabel(right, text=status, text_color=status_color, font=("Arial", 14)).pack(pady=5)
-        btn_add = ctk.CTkButton(right, text="🛒 THÊM VÀO GIỎ", fg_color="#d63031", hover_color="#c0392b", font=("Segoe UI", 14, "bold"), height=45, corner_radius=10, command=lambda: [self.add_item_to_cart(product), top.destroy()])
+        btn_add = ctk.CTkButton(right, text="THÊM VÀO GIỎ", fg_color="#d63031", hover_color="#c0392b", font=("Segoe UI", 14, "bold"), height=45, corner_radius=10, command=lambda: [self.add_item_to_cart(product), top.destroy()])
         btn_add.pack(pady=30, fill="x")
         if product[7] <= 0: btn_add.configure(state="disabled", fg_color="gray")
 
@@ -449,7 +446,7 @@ class HomeTab(ctk.CTkFrame):
 
     def update_cart_btn(self):
         count = sum(item['qty'] for item in self.cart)
-        self.btn_cart.configure(text=f"🛒 Giỏ hàng ({count})")
+        self.btn_cart.configure(text=f"Giỏ hàng ({count})")
 
     def open_cart_popup(self):
         if not self.cart:

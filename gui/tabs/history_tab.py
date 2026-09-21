@@ -23,9 +23,9 @@ class HistoryTab(ctk.CTkFrame): # Kế thừa CTkFrame
         self.tab_view.pack(fill="both", expand=True, padx=20, pady=10)
 
         # Tạo tab con
-        self.tab_view.add("🛒 Lịch Sử Mua Hàng" if self.current_user['role'] == 'customer' else "🛒 Lịch Sử Bán Hàng")
+        self.tab_view.add("Lịch Sử Mua Hàng" if self.current_user['role'] == 'customer' else "Lịch Sử Bán Hàng")
         if self.current_user['role'] != 'customer':
-            self.tab_view.add("🚛 Lịch Sử Nhập Hàng")
+            self.tab_view.add("Lịch Sử Nhập Hàng")
 
         # Cấu hình Style cho bảng (Treeview)
         self.setup_treeview_style()
@@ -41,7 +41,7 @@ class HistoryTab(ctk.CTkFrame): # Kế thừa CTkFrame
         footer = ctk.CTkFrame(self, fg_color="transparent")
         footer.pack(fill="x", pady=10)
         
-        btn_refresh = ctk.CTkButton(footer, text="🔄 Làm mới dữ liệu", 
+        btn_refresh = ctk.CTkButton(footer, text="Làm mới dữ liệu", 
                       fg_color="#0984e3", hover_color="#00cec9",
                       font=("Arial", 12, "bold"), height=40,
                       command=self.load_data)
@@ -63,7 +63,7 @@ class HistoryTab(ctk.CTkFrame): # Kế thừa CTkFrame
 
     def setup_sales_table(self):
         # Lấy frame cha là nội dung của Tab "Bán Hàng"
-        tab_name = "🛒 Lịch Sử Mua Hàng" if self.current_user['role'] == 'customer' else "🛒 Lịch Sử Bán Hàng"
+        tab_name = "Lịch Sử Mua Hàng" if self.current_user['role'] == 'customer' else "Lịch Sử Bán Hàng"
         parent_tab = self.tab_view.tab(tab_name)
         
         # Frame chứa bảng
@@ -92,7 +92,7 @@ class HistoryTab(ctk.CTkFrame): # Kế thừa CTkFrame
 
     def setup_imports_table(self):
         # Lấy frame cha là nội dung của Tab "Nhập Hàng"
-        parent_tab = self.tab_view.tab("🚛 Lịch Sử Nhập Hàng")
+        parent_tab = self.tab_view.tab("Lịch Sử Nhập Hàng")
 
         table_frame = ctk.CTkFrame(parent_tab, fg_color="transparent")
         table_frame.pack(fill="both", expand=True, padx=10, pady=10)
@@ -129,7 +129,11 @@ class HistoryTab(ctk.CTkFrame): # Kế thừa CTkFrame
         sales = self.history_service.get_sales_history(user_id=uid)
         for row in sales:
             # Format tiền và ngày
-            total = "{:,.0f}".format(row[3])
+            try:
+                total_val = float(row[3] or 0)
+            except (ValueError, TypeError):
+                total_val = 0
+            total = "{:,.0f}".format(total_val)
             try:
                 date = row[4].strftime("%d/%m/%Y %H:%M")
             except (AttributeError, TypeError):
@@ -142,8 +146,13 @@ class HistoryTab(ctk.CTkFrame): # Kế thừa CTkFrame
             for i in self.tree_imports.get_children(): self.tree_imports.delete(i)
             imports = self.history_service.get_import_history()
             for row in imports:
-                price = "{:,.0f}".format(row[3])
-                total_cost = "{:,.0f}".format(row[4])
+                try:
+                    price_val = float(row[3] or 0)
+                    total_val = float(row[4] or 0)
+                except (ValueError, TypeError):
+                    price_val = total_val = 0
+                price = "{:,.0f}".format(price_val)
+                total_cost = "{:,.0f}".format(total_val)
                 try:
                     date = row[5].strftime("%d/%m/%Y %H:%M")
                 except (AttributeError, TypeError):

@@ -28,7 +28,7 @@ class PosTab(ctk.CTkFrame): # Kế thừa CTkFrame
         search_frame = ctk.CTkFrame(self.frame_left, fg_color="transparent")
         search_frame.pack(fill="x", padx=15, pady=15)
         
-        ctk.CTkLabel(search_frame, text="🔍 Tìm SP:", font=("Arial", 12, "bold")).pack(side="left")
+        ctk.CTkLabel(search_frame, text="Tìm SP:", font=("Arial", 12, "bold")).pack(side="left")
         
         self.entry_search = ctk.CTkEntry(search_frame, placeholder_text="Nhập tên sản phẩm...", height=35)
         self.entry_search.pack(side="left", fill="x", expand=True, padx=10)
@@ -73,7 +73,7 @@ class PosTab(ctk.CTkFrame): # Kế thừa CTkFrame
         self.frame_right.grid(row=0, column=1, sticky="nsew", padx=0, pady=0)
 
         # Header Giỏ hàng
-        ctk.CTkLabel(self.frame_right, text="🛒 GIỎ HÀNG", 
+        ctk.CTkLabel(self.frame_right, text="GIỎ HÀNG", 
                      font=("Segoe UI", 16, "bold")).pack(pady=15)
 
         # Bảng Giỏ hàng
@@ -97,12 +97,12 @@ class PosTab(ctk.CTkFrame): # Kế thừa CTkFrame
         btn_box = ctk.CTkFrame(self.frame_right, fg_color="transparent")
         btn_box.pack(fill="x", padx=15, pady=10)
         
-        btn_remove = ctk.CTkButton(btn_box, text="❌ Xóa món", width=100, fg_color="#fab1a0", hover_color="#e17055", text_color="black",
+        btn_remove = ctk.CTkButton(btn_box, text="Xóa món", width=100, fg_color="#fab1a0", hover_color="#e17055", text_color="black",
                       command=self.remove_item)
         btn_remove.pack(side="left")
         ToolTip(btn_remove, "Xóa sản phẩm đã chọn khỏi giỏ hàng")
         
-        btn_clear = ctk.CTkButton(btn_box, text="🗑️ Xóa hết", width=100, fg_color="#ff7675", hover_color="#d63031",
+        btn_clear = ctk.CTkButton(btn_box, text="Xóa hết", width=100, fg_color="#ff7675", hover_color="#d63031",
                       command=self.clear_cart)
         btn_clear.pack(side="right")
         ToolTip(btn_clear, "Làm trống toàn bộ giỏ hàng")
@@ -131,7 +131,11 @@ class PosTab(ctk.CTkFrame): # Kế thừa CTkFrame
         for p in products:
             if p[7] > 0: 
                 if keyword and keyword.lower() not in p[2].lower(): continue
-                price = "{:,.0f}".format(p[6])
+                try:
+                    price_val = float(p[6] or 0)
+                except (ValueError, TypeError):
+                    price_val = 0
+                price = "{:,.0f}".format(price_val)
                 self.tree_products.insert("", "end", values=(p[0], p[2], price, p[7]))
 
     def search_product(self, event=None):
@@ -230,7 +234,7 @@ class PosTab(ctk.CTkFrame): # Kế thừa CTkFrame
         self.lbl_chk_final.pack(fill="x")
 
         # 4. Nút Xác Nhận
-        btn_confirm = ctk.CTkButton(content, text="💸 XÁC NHẬN & IN HÓA ĐƠN", height=50, 
+        btn_confirm = ctk.CTkButton(content, text="XÁC NHẬN & IN HÓA ĐƠN", height=50, 
                       fg_color="#00b894", hover_color="#00a884", font=("Segoe UI", 14, "bold"),
                       command=self.process_final_payment)
         btn_confirm.pack(fill="x", side="bottom")

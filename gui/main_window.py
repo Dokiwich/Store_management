@@ -106,24 +106,24 @@ class MainWindow(ctk.CTk):
         self.menu_frame.pack(fill="both", expand=True, padx=10)
 
         # === [PHÂN QUYỀN MENU - LOGIC GIỮ NGUYÊN] ===
-        self.btn_home = self.create_nav_btn("🏠  Trang Chủ", self.show_home_tab)
+        self.btn_home = self.create_nav_btn("Trang Chủ", self.show_home_tab)
         
         if self.role == 'customer':
-            self.btn_my_orders = self.create_nav_btn("📦  Đơn Hàng Của Tôi", self.show_history_tab)
+            self.btn_my_orders = self.create_nav_btn("Đơn Hàng Của Tôi", self.show_history_tab)
             
-        self.btn_warr = self.create_nav_btn("🔍  Tra Cứu BH", self.show_warranty_tab)
+        self.btn_warr = self.create_nav_btn("Tra Cứu Bảo Hành", self.show_warranty_tab)
 
         if self.role in ['admin', 'staff']:
             self.create_separator()
-            self.btn_pos = self.create_nav_btn("🛒  Bán Hàng", self.show_pos_tab)
-            self.btn_prod = self.create_nav_btn("📦  Kho Hàng", self.show_product_tab)
-            self.btn_cust = self.create_nav_btn("👥  Khách Hàng", self.show_customer_tab)
-            self.btn_hist = self.create_nav_btn("📜  Lịch Sử", self.show_history_tab)
+            self.btn_pos = self.create_nav_btn("Bán Hàng (POS)", self.show_pos_tab)
+            self.btn_prod = self.create_nav_btn("Kho Hàng", self.show_product_tab)
+            self.btn_cust = self.create_nav_btn("Khách Hàng", self.show_customer_tab)
+            self.btn_hist = self.create_nav_btn("Lịch Sử Hoạt Động", self.show_history_tab)
 
         if self.role == 'admin':
             self.create_separator()
-            self.btn_dash = self.create_nav_btn("📊  Thống Kê", self.show_dashboard_tab)
-            self.btn_emp = self.create_nav_btn("👤  Nhân Viên", self.show_employee_tab)
+            self.btn_dash = self.create_nav_btn("Thống Kê Doanh Thu", self.show_dashboard_tab)
+            self.btn_emp = self.create_nav_btn("Nhân Viên", self.show_employee_tab)
 
         # C. Bottom Section (Logout & Theme)
         self.bottom_frame = ctk.CTkFrame(self.sidebar, fg_color="transparent")
@@ -136,7 +136,7 @@ class MainWindow(ctk.CTk):
         self.theme_switch.pack(pady=10)
 
         # Nút Logout
-        self.btn_logout = ctk.CTkButton(self.bottom_frame, text="🚪 Đăng Xuất", 
+        self.btn_logout = ctk.CTkButton(self.bottom_frame, text="Đăng Xuất", 
                                         fg_color="#ef4444", hover_color="#dc2626",
                                         height=40, corner_radius=10, 
                                         font=("Segoe UI", 12, "bold"),
@@ -169,23 +169,23 @@ class MainWindow(ctk.CTk):
         # === ONBOARDING TOUR ===
         if GuidedTour.should_show_tour():
             tour = GuidedTour(self)
-            tour.add_step(None, "Chào mừng đến Laptop Store! 🎉",
+            tour.add_step(None, "Chào Mừng Đến Laptop Store",
                           "Hướng dẫn này sẽ giúp bạn làm quen với các tính năng chính.")
-            tour.add_step(self.sidebar, "📌 Menu Điều Hướng",
+            tour.add_step(self.sidebar, "Menu Điều Hướng",
                           "Đây là thanh menu bên trái. Nhấn vào từng mục để chuyển trang.")
-            tour.add_step(self.btn_home, "🏠 Trang Chủ",
+            tour.add_step(self.btn_home, "Trang Chủ",
                           "Xem sản phẩm nổi bật, tìm kiếm và lọc laptop theo nhu cầu.")
             if self.role in ['admin', 'staff']:
-                tour.add_step(self.btn_pos, "🛒 Bán Hàng (POS)",
+                tour.add_step(self.btn_pos, "Bán Hàng (POS)",
                               "Tạo đơn hàng mới. Tìm sản phẩm, thêm vào giỏ, thanh toán và in hóa đơn PDF.")
-                tour.add_step(self.btn_prod, "📦 Kho Hàng",
+                tour.add_step(self.btn_prod, "Kho Hàng",
                               "Thêm, sửa, xóa sản phẩm. Xuất danh sách ra Excel.")
             if self.role == 'admin':
-                tour.add_step(self.btn_dash, "📊 Thống Kê",
+                tour.add_step(self.btn_dash, "Thống Kê Doanh Thu",
                               "Biểu đồ doanh thu theo tháng/năm, sản phẩm bán chạy, tồn kho thấp.")
-            tour.add_step(self.content_area, "📄 Vùng Nội Dung",
+            tour.add_step(self.content_area, "Vùng Nội Dung",
                           "Nội dung chính hiển thị ở đây. Mỗi trang có bảng dữ liệu, bộ lọc riêng.")
-            tour.add_step(self.theme_switch, "🌙 Dark Mode",
+            tour.add_step(self.theme_switch, "Chế Độ Sáng / Tối",
                           "Bật/tắt chế độ tối cho mắt thoải mái hơn.")
             tour.start()
 
@@ -336,7 +336,7 @@ class MainWindow(ctk.CTk):
     def show_employee_tab(self):
         self.clear_content()
         if "employee" not in self.cached_tabs:
-            self.cached_tabs["employee"] = EmployeeTab(self.content_area, self.user_service)
+            self.cached_tabs["employee"] = EmployeeTab(self.content_area, self.user_service, self.current_user)
         else:
             self.cached_tabs["employee"].load_data()
         self.cached_tabs["employee"].pack(fill="both", expand=True)

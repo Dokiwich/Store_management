@@ -12,6 +12,7 @@ class CustomerDAO:
                 return cursor.fetchall()
             finally:
                 cursor.close()
+                if conn: conn.close()
         return []
 
     def count_customers(self):
@@ -23,6 +24,7 @@ class CustomerDAO:
                 return cursor.fetchone()[0]
             finally:
                 cursor.close()
+                if conn: conn.close()
         return 0
 
     def get_customer_by_phone(self, phone):
@@ -34,6 +36,7 @@ class CustomerDAO:
                 return cursor.fetchone()
             finally:
                 cursor.close()
+                if conn: conn.close()
         return None
 
     def add_customer(self, name, phone, email, address):
@@ -50,4 +53,5 @@ class CustomerDAO:
                 return False, str(e) # Thường lỗi trùng SĐT
             finally:
                 cursor.close()
+                if conn: conn.close()
         return False, "Lỗi kết nối"

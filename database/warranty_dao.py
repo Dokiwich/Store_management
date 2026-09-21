@@ -18,7 +18,8 @@ class WarrantyDAO:
                         c.phone,
                         p.name as product_name,
                         od.price_at_sale,
-                        o.created_at
+                        o.created_at,
+                        p.warranty_time
                     FROM orders o
                     LEFT JOIN customers c ON o.customer_id = c.id
                     JOIN order_details od ON o.id = od.order_id
@@ -32,4 +33,5 @@ class WarrantyDAO:
                 results = cursor.fetchall()
             finally:
                 cursor.close()
+                if conn: conn.close()
         return results

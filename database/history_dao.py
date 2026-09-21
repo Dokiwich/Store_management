@@ -28,6 +28,7 @@ class HistoryDAO:
                 return cursor.fetchall()
             finally:
                 cursor.close()
+                if conn: conn.close()
         return []
 
     def count_sales_history(self, user_id=None):
@@ -44,6 +45,7 @@ class HistoryDAO:
                 return cursor.fetchone()[0]
             finally:
                 cursor.close()
+                if conn: conn.close()
         return 0
 
     def get_import_history(self, limit=50, offset=0):
@@ -61,6 +63,7 @@ class HistoryDAO:
                 return cursor.fetchall()
             finally:
                 cursor.close()
+                if conn: conn.close()
         return []
 
     def count_import_history(self):
@@ -73,4 +76,5 @@ class HistoryDAO:
                 return cursor.fetchone()[0]
             finally:
                 cursor.close()
+                if conn: conn.close()
         return 0

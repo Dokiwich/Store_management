@@ -17,6 +17,7 @@ class CartItem:
             'name': self.name,
             'price': self.price,
             'qty': self.qty,
+            'quantity': self.qty,
             'total': self.total
         }
 

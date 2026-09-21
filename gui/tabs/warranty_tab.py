@@ -12,7 +12,7 @@ class WarrantyTab(ctk.CTkFrame): # Kế thừa CTkFrame
         header = ctk.CTkFrame(self, fg_color="transparent", height=50)
         header.pack(fill="x", pady=(20, 10))
         
-        ctk.CTkLabel(header, text="🛡️ TRA CỨU BẢO HÀNH", 
+        ctk.CTkLabel(header, text="TRA CỨU BẢO HÀNH", 
                      text_color=("#2563eb", "white"),
                      font=("Segoe UI", 24, "bold")).pack(side="left", padx=20)
 
@@ -34,7 +34,7 @@ class WarrantyTab(ctk.CTkFrame): # Kế thừa CTkFrame
         self.entry_search.pack(side="left", padx=10)
         self.entry_search.bind("<Return>", lambda e: self.do_search())
         
-        btn_search = ctk.CTkButton(inner_search, text="🔍 Tra Cứu", 
+        btn_search = ctk.CTkButton(inner_search, text="Tra Cứu", 
                       fg_color="#2563eb", hover_color="#1d4ed8",
                       width=120, height=35,
                       font=("Segoe UI", 13, "bold"),
@@ -94,10 +94,20 @@ class WarrantyTab(ctk.CTkFrame): # Kế thừa CTkFrame
             return
 
         for row in rows:
-            # row: (order_id, name, phone, product, price, created_at)
+            # row: (order_id, name, phone, product, price, created_at, warranty_time)
             try:
                 purchase_date = row[5]
-                expiry_date = purchase_date + timedelta(days=365)
+                # Đọc warranty_time từ CSDL (mặc định 12 tháng)
+                w_raw = row[6] if len(row) > 6 else 12
+                months = 12
+                if w_raw:
+                    try:
+                        nums = [int(s) for s in str(w_raw).split() if s.isdigit()]
+                        months = nums[0] if nums else int(w_raw)
+                    except:
+                        months = 12
+
+                expiry_date = purchase_date + timedelta(days=months * 30)
                 today = datetime.now()
                 
                 # Logic hiển thị trạng thái

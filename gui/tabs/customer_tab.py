@@ -11,7 +11,7 @@ class CustomerTab(ctk.CTkFrame): # Kế thừa CTkFrame
         # Header
         header = ctk.CTkFrame(self, fg_color="transparent")
         header.pack(fill="x", pady=(10, 5))
-        ctk.CTkLabel(header, text="👥 QUẢN LÝ KHÁCH HÀNG", 
+        ctk.CTkLabel(header, text="QUẢN LÝ KHÁCH HÀNG", 
                      text_color=("#111827", "white"),
                      font=("Segoe UI", 20, "bold")).pack(anchor="w", padx=20)
 
@@ -43,14 +43,14 @@ class CustomerTab(ctk.CTkFrame): # Kế thừa CTkFrame
         self.entry_email = create_input("Email:", frame_input)
         
         # Nút Thêm
-        btn_add = ctk.CTkButton(frame_input, text="➕ Lưu Khách Hàng", height=45,
+        btn_add = ctk.CTkButton(frame_input, text="Lưu Khách Hàng", height=45,
                       fg_color="#00b894", hover_color="#00a884", font=("Segoe UI", 13, "bold"),
                       command=self.add_customer)
         btn_add.pack(fill="x", padx=20, pady=30)
         ToolTip(btn_add, "Lưu thông tin khách hàng mới vào hệ thống")
         
         # (Optional) Nút Làm mới form
-        btn_clear = ctk.CTkButton(frame_input, text="🔄 Làm mới Form", height=40,
+        btn_clear = ctk.CTkButton(frame_input, text="Làm mới Form", height=40,
                       fg_color="gray", hover_color="gray40",
                       command=self.clear_form)
         btn_clear.pack(fill="x", padx=20)

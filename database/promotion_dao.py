@@ -43,6 +43,8 @@ class PromotionDAO:
             else: # Nếu là giảm số tiền cố định (money)
                 discount_amt = p_val
             
+            # Đảm bảo mức giảm giá không bao giờ vượt quá tổng tiền hóa đơn
+            discount_amt = min(discount_amt, total_bill_dec)
             return True, float(discount_amt)
 
         except Exception as e:
@@ -50,6 +52,7 @@ class PromotionDAO:
             return False, f"Lỗi kiểm tra mã: {str(e)}"
         finally:
             cursor.close()
+            if conn: conn.close()
 
     def get_active_promotions(self, limit=50, offset=0):
         conn = self.db_manager.get_connection()
@@ -63,4 +66,5 @@ class PromotionDAO:
                 return []
             finally:
                 cursor.close()
+                if conn: conn.close()
         return []

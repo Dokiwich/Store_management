@@ -29,10 +29,11 @@ class ReportDAO:
                 stats["low_stock"] = cursor.fetchone()[0]
             finally:
                 cursor.close()
+                if conn: conn.close()
         return stats
 
-    def get_top_selling_products(self):
-        """Lấy top 5 sản phẩm bán chạy nhất"""
+    def get_top_selling_products(self, limit=5, offset=0):
+        """Lấy top sản phẩm bán chạy nhất"""
         conn = self.db_manager.get_connection()
         data = []
         if conn:
@@ -46,12 +47,13 @@ class ReportDAO:
                     WHERE o.status = 'Completed'
                     GROUP BY p.id, p.name
                     ORDER BY total_qty DESC
-                    LIMIT 5
+                    LIMIT %s OFFSET %s
                 """
-                cursor.execute(query)
+                cursor.execute(query, (int(limit), int(offset)))
                 data = cursor.fetchall() # Trả về list các tuple [(Name, Qty), ...]
             finally:
                 cursor.close()
+                if conn: conn.close()
         return data
 
     def get_available_years(self):
@@ -66,6 +68,7 @@ class ReportDAO:
                 years = [str(r[0]) for r in res if r[0]]
             finally:
                 cursor.close()
+                if conn: conn.close()
         return years
 
     def get_revenue_by_year(self, year):
@@ -88,6 +91,7 @@ class ReportDAO:
                         data[month - 1] = total
             finally:
                 cursor.close()
+                if conn: conn.close()
         return data
 
     def get_category_share(self):
@@ -98,14 +102,16 @@ class ReportDAO:
             cursor = conn.cursor()
             try:
                 cursor.execute("""
-                    SELECT p.category, SUM(od.quantity) 
+                    SELECT c.name, SUM(od.quantity) 
                     FROM order_details od
                     JOIN products p ON od.product_id = p.id
+                    JOIN categories c ON p.category_id = c.id
                     JOIN orders o ON od.order_id = o.id
                     WHERE o.status = 'Completed'
-                    GROUP BY p.category
+                    GROUP BY c.name
                 """)
                 data = cursor.fetchall()
             finally:
                 cursor.close()
+                if conn: conn.close()
         return data

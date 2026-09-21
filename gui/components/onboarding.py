@@ -160,7 +160,7 @@ class GuidedTour:
                       command=self._skip).pack(side="left")
 
         is_last = self.current_step >= len(self.steps) - 1
-        next_text = "Hoàn tất ✓" if is_last else "Tiếp theo →"
+        next_text = "Hoàn tất" if is_last else "Tiếp theo"
         ctk.CTkButton(btn_frame, text=next_text, width=100, height=32,
                       fg_color="#2563eb", hover_color="#1d4ed8",
                       corner_radius=8, font=("Segoe UI", 11, "bold"),

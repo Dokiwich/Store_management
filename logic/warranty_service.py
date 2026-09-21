@@ -2,8 +2,8 @@ class WarrantyService:
     def __init__(self, warranty_dao):
         self.dao = warranty_dao
 
-    def search_warranty(self, keyword):
-        keyword = keyword.strip() if keyword else ''
-        if len(keyword) < 3:
-            return []  # Tối thiểu 3 ký tự để tìm kiếm
-        return self.dao.search_warranty(keyword)
+    def search_warranty(self, keyword='', limit=50):
+        kw = keyword.strip() if keyword else ''
+        if kw and len(kw) < 3:
+            return []  # Nếu có nhập từ khóa thì tối thiểu 3 ký tự
+        return self.dao.search_warranty(kw, limit=limit)

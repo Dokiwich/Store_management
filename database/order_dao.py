@@ -68,7 +68,16 @@ class OrderDAO:
                 # 4. Lưu chi tiết đơn hàng
                 cursor.execute(sql_detail, (order_id, p_id, qty, verified_price))
 
-            # 4. Lưu tất cả thay đổi (Commit)
+            # 5. Tự động tích lũy điểm thưởng thành viên (FR-07: 100.000đ = 1 điểm)
+            if customer_id:
+                earned_points = int(float(total_amount or 0) / 100000)
+                if earned_points > 0:
+                    cursor.execute(
+                        "UPDATE customers SET loyalty_points = loyalty_points + %s WHERE id = %s",
+                        (earned_points, customer_id)
+                    )
+
+            # 6. Lưu tất cả thay đổi (Commit)
             conn.commit()
             return True, f"Thanh toán thành công! Mã đơn: {order_id}"
 
@@ -82,3 +91,4 @@ class OrderDAO:
             return False, f"Lỗi hệ thống: {str(e)}"
         finally:
             cursor.close()
+            if conn: conn.close()

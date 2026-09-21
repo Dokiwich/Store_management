@@ -3,15 +3,16 @@ import customtkinter as ctk # Import CustomTkinter
 from gui.components.tooltip import ToolTip
 
 class EmployeeTab(ctk.CTkFrame): # Kế thừa CTkFrame
-    def __init__(self, parent, user_service):
+    def __init__(self, parent, user_service, current_user=None):
         super().__init__(parent, fg_color="transparent")
         self.user_service = user_service
+        self.current_user = current_user
 
         # 1. Header
         header = ctk.CTkFrame(self, fg_color="transparent")
         header.pack(fill="x", pady=(10, 5))
         
-        ctk.CTkLabel(header, text="👥 QUẢN LÝ NHÂN VIÊN", 
+        ctk.CTkLabel(header, text="QUẢN LÝ NHÂN VIÊN", 
                      text_color=("#111827", "white"), 
                      font=("Segoe UI", 20, "bold")).pack(anchor="w", padx=20)
 
@@ -53,13 +54,13 @@ class EmployeeTab(ctk.CTkFrame): # Kế thừa CTkFrame
         self.cb_role.set("staff") # Giá trị mặc định
 
         # Các nút bấm
-        btn_add = ctk.CTkButton(frame_form, text="➕ Thêm", height=45,
+        btn_add = ctk.CTkButton(frame_form, text="Thêm Nhân Viên", height=45,
                       fg_color="#2563eb", hover_color="#1d4ed8", font=("Segoe UI", 13, "bold"),
                       command=self.add_employee)
         btn_add.pack(fill="x", padx=20, pady=(10, 10))
         ToolTip(btn_add, "Tạo tài khoản nhân viên mới")
 
-        btn_delete = ctk.CTkButton(frame_form, text="🗑️ Xóa Đã Chọn", height=45,
+        btn_delete = ctk.CTkButton(frame_form, text="Xóa Đã Chọn", height=45,
                       fg_color="#ef4444", hover_color="#b91c1c", font=("Segoe UI", 13, "bold"),
                       command=self.delete_employee)
         btn_delete.pack(fill="x", padx=20)
@@ -142,6 +143,10 @@ class EmployeeTab(ctk.CTkFrame): # Kế thừa CTkFrame
         u_id = item['values'][0]
         u_name = item['values'][1]
         
+        if self.current_user and str(u_id) == str(self.current_user.get('id')):
+            messagebox.showwarning("Cảnh báo", "Không thể tự khóa tài khoản của chính mình!")
+            return
+
         if messagebox.askyesno("Xác nhận", f"Bạn muốn khóa tài khoản {u_name}?"):
             if self.user_service.delete_user(u_id):
                 self.load_data()

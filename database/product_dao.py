@@ -3,7 +3,10 @@ class ProductDAO:
         SELECT p.id, p.supplier_id, p.name, c.name, b.name, 
                p.import_price, p.price, p.stock_quantity, 
                p.spec_cpu, p.spec_ram, p.spec_screen, p.spec_hard_drive, 
-               p.spec_gpu, p.spec_weight, p.spec_os, p.description, p.is_active 
+               p.spec_gpu, p.spec_weight, p.spec_os, p.description, p.is_active,
+               p.sku, p.spec_max_ram, p.spec_panel, p.spec_brightness,
+               p.spec_battery, p.spec_color, p.warranty_time, p.condition_status,
+               p.short_description, p.highlights, p.min_stock
         FROM products p 
         LEFT JOIN categories c ON p.category_id = c.id 
         LEFT JOIN brands b ON p.brand_id = b.id 
@@ -22,6 +25,7 @@ class ProductDAO:
                 return cursor.fetchall()
             finally:
                 cursor.close()
+                if conn: conn.close()
         return []
 
     def get_product_by_id(self, p_id):
@@ -34,6 +38,7 @@ class ProductDAO:
                 return cursor.fetchone()
             finally:
                 cursor.close()
+                if conn: conn.close()
         return None
 
     def _get_or_create_category(self, cursor, name):
@@ -51,7 +56,9 @@ class ProductDAO:
         return cursor.lastrowid
 
     def add_product(self, name, category, brand, supplier_id, import_price, price, stock, 
-                    cpu, ram, screen, hard_drive, gpu, weight, os_sys, description):
+                    cpu, ram, screen, hard_drive, gpu, weight, os_sys, description,
+                    sku=None, max_ram=None, panel=None, brightness=None, battery=None,
+                    color=None, warranty=None, condition=None, short_desc=None, highlights=None, min_stock=5):
         conn = self.db_manager.get_connection()
         if conn:
             cursor = conn.cursor()
@@ -63,11 +70,16 @@ class ProductDAO:
                     INSERT INTO products 
                     (name, category_id, brand_id, supplier_id, import_price, price, stock_quantity, 
                      spec_cpu, spec_ram, spec_screen, spec_hard_drive, spec_gpu, spec_weight, spec_os, 
-                     description, is_active)
-                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, 1)
+                     description, is_active, sku, spec_max_ram, spec_panel, spec_brightness,
+                     spec_battery, spec_color, warranty_time, condition_status, short_description,
+                     highlights, min_stock)
+                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, 1,
+                            %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
                 """
                 cursor.execute(query_prod, (name, cat_id, brand_id, supplier_id, import_price, price, stock, 
-                                            cpu, ram, screen, hard_drive, gpu, weight, os_sys, description))
+                                            cpu, ram, screen, hard_drive, gpu, weight, os_sys, description,
+                                            sku, max_ram, panel, brightness, battery, color, warranty,
+                                            condition, short_desc, highlights, min_stock))
                 product_id = cursor.lastrowid
                 
                 if stock > 0:
@@ -83,10 +95,13 @@ class ProductDAO:
                 return False
             finally:
                 cursor.close()
+                if conn: conn.close()
         return False
 
     def update_product(self, p_id, name, category, brand, supplier_id, import_price, price, stock, 
-                       cpu, ram, screen, hard_drive, gpu, weight, os_sys, description):
+                       cpu, ram, screen, hard_drive, gpu, weight, os_sys, description,
+                       sku=None, max_ram=None, panel=None, brightness=None, battery=None,
+                       color=None, warranty=None, condition=None, short_desc=None, highlights=None, min_stock=5):
         conn = self.db_manager.get_connection()
         if conn:
             cursor = conn.cursor()
@@ -98,11 +113,14 @@ class ProductDAO:
                     UPDATE products 
                     SET name=%s, category_id=%s, brand_id=%s, supplier_id=%s, import_price=%s, price=%s, stock_quantity=%s, 
                         spec_cpu=%s, spec_ram=%s, spec_screen=%s, spec_hard_drive=%s, spec_gpu=%s, spec_weight=%s, spec_os=%s, 
-                        description=%s
+                        description=%s, sku=%s, spec_max_ram=%s, spec_panel=%s, spec_brightness=%s, spec_battery=%s,
+                        spec_color=%s, warranty_time=%s, condition_status=%s, short_description=%s, highlights=%s, min_stock=%s
                     WHERE id=%s
                 """
                 cursor.execute(query, (name, cat_id, brand_id, supplier_id, import_price, price, stock, 
-                                       cpu, ram, screen, hard_drive, gpu, weight, os_sys, description, p_id))
+                                       cpu, ram, screen, hard_drive, gpu, weight, os_sys, description,
+                                       sku, max_ram, panel, brightness, battery, color, warranty, condition,
+                                       short_desc, highlights, min_stock, p_id))
                 conn.commit()
                 return True
             except Exception as e:
@@ -111,6 +129,7 @@ class ProductDAO:
                 return False
             finally:
                 cursor.close()
+                if conn: conn.close()
         return False
 
     def delete_product(self, p_id):
@@ -122,10 +141,12 @@ class ProductDAO:
                 conn.commit()
                 return True
             except Exception as e:
-                print(f"Lỗi: {e}")
+                print(f"Lỗi delete_product: {e}")
+                conn.rollback()
                 return False
             finally:
                 cursor.close()
+                if conn: conn.close()
         return False
 
     def search_products(self, keyword, category_filter=None):
@@ -150,6 +171,7 @@ class ProductDAO:
                 return cursor.fetchall()
             finally:
                 cursor.close()
+                if conn: conn.close()
         return []
     
     def filter_products(self, category=None, brand=None, price_range=None, keyword=None):
@@ -181,6 +203,7 @@ class ProductDAO:
                 return cursor.fetchall()
             finally:
                 cursor.close()
+                if conn: conn.close()
         return []
 
     def get_similar_products(self, current_id, category, price):
@@ -199,6 +222,7 @@ class ProductDAO:
                 return cursor.fetchall()
             finally:
                 cursor.close()
+                if conn: conn.close()
         return []
 
     def get_all_categories(self):
@@ -209,7 +233,9 @@ class ProductDAO:
                 cursor.execute("SELECT name FROM categories ORDER BY name")
                 return [row[0] for row in cursor.fetchall()]
             except: pass
-            finally: cursor.close()
+            finally:
+                cursor.close()
+                if conn: conn.close()
         return []
 
     def get_all_brands(self):
@@ -220,5 +246,7 @@ class ProductDAO:
                 cursor.execute("SELECT name FROM brands ORDER BY name")
                 return [row[0] for row in cursor.fetchall()]
             except: pass
-            finally: cursor.close()
+            finally:
+                cursor.close()
+                if conn: conn.close()
         return []

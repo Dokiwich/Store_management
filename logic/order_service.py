@@ -64,7 +64,7 @@ class OrderService:
         voucher_code = self.cart.voucher_code if self.cart.voucher_code else ""
 
         # Gọi DAO để lưu order
-        success, msg = self.dao.create_order(user_id, customer_id, cart_items_dict, total_amount, voucher_code)
+        success, msg = self.dao.create_order(user_id, voucher_code, total_amount, cart_items_dict, customer_id)
         if success:
             self.clear_cart()
             

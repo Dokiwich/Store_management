@@ -11,4 +11,5 @@ class SupplierDAO:
                 return cursor.fetchall()
             finally:
                 cursor.close()
+                if conn: conn.close()
         return []

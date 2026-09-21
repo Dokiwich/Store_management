@@ -24,15 +24,15 @@ class ProductTab(ctk.CTkFrame): # Kế thừa CTkFrame
 
         # Các Nút Thao Tác
         if self.current_user['role'] == 'admin':
-            self.btn_add = self.create_sidebar_button("➕ Thêm Laptop", "#00b894", "#00a884", self.open_add_dialog)
-            self.btn_edit = self.create_sidebar_button("✏️ Cập Nhật", "#fdcb6e", "#e1b12c", self.open_edit_popup)
-            self.btn_del = self.create_sidebar_button("🗑️ Xóa Laptop", "#ff7675", "#d63031", self.delete_product)
+            self.btn_add = self.create_sidebar_button("Thêm Laptop", "#00b894", "#00a884", self.open_add_dialog)
+            self.btn_edit = self.create_sidebar_button("Cập Nhật", "#fdcb6e", "#e1b12c", self.open_edit_popup)
+            self.btn_del = self.create_sidebar_button("Xóa Laptop", "#ff7675", "#d63031", self.delete_product)
             ToolTip(self.btn_add, "Thêm sản phẩm mới vào kho")
             ToolTip(self.btn_edit, "Sửa thông tin sản phẩm đã chọn")
             ToolTip(self.btn_del, "Xóa vĩnh viễn sản phẩm")
             
-        self.btn_reload = self.create_sidebar_button("🔄 Tải Lại", "#2563eb", "#1d4ed8", self.reload_data, text_color="white")
-        self.btn_export = self.create_sidebar_button("📤 Xuất Excel", "#16a34a", "#15803d", self.export_excel, text_color="white")
+        self.btn_reload = self.create_sidebar_button("Tải Lại", "#2563eb", "#1d4ed8", self.reload_data, text_color="white")
+        self.btn_export = self.create_sidebar_button("Xuất Excel", "#16a34a", "#15803d", self.export_excel, text_color="white")
         
         ToolTip(self.btn_reload, "Tải lại danh sách từ cơ sở dữ liệu")
         ToolTip(self.btn_export, "Xuất danh sách sản phẩm ra file Excel")
@@ -49,7 +49,7 @@ class ProductTab(ctk.CTkFrame): # Kế thừa CTkFrame
         inner_search = ctk.CTkFrame(self.frame_search, fg_color="transparent")
         inner_search.pack(padx=10, pady=10, fill="x")
 
-        ctk.CTkLabel(inner_search, text="🔍 Tìm kiếm:", font=("Arial", 12)).pack(side="left")
+        ctk.CTkLabel(inner_search, text="Tìm kiếm:", font=("Arial", 12)).pack(side="left")
         
         self.entry_search = ctk.CTkEntry(inner_search, width=200, placeholder_text="Nhập tên laptop...")
         self.entry_search.pack(side="left", padx=10)
@@ -431,8 +431,10 @@ class ProductTab(ctk.CTkFrame): # Kế thừa CTkFrame
             add_row("VGA:", product[12])
         except IndexError: pass
 
-        add_row("Giá nhập:", "{:,.0f} VNĐ".format(product[5]), color="gray")
-        add_row("Giá bán:", "{:,.0f} VNĐ".format(product[6]), color="#e74c3c")
+        imp_val = float(product[5] or 0)
+        price_val = float(product[6] or 0)
+        add_row("Giá nhập:", "{:,.0f} VNĐ".format(imp_val), color="gray")
+        add_row("Giá bán:", "{:,.0f} VNĐ".format(price_val), color="#e74c3c")
         add_row("Tồn kho:", f"{product[7]} chiếc", color="#27ae60")
 
         ctk.CTkButton(top, text="Đóng", command=top.destroy, 

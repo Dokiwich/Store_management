@@ -21,9 +21,10 @@ except Exception:
 
 # Thông tin cửa hàng
 STORE_NAME = "LAPTOP STORE"
-STORE_ADDRESS = "123 Nguyễn Trãi, Quận 1, TP.HCM"
-STORE_TAX_ID = "MST: 0123456789"
-STORE_HOTLINE = "Hotline: 1900 1000"
+STORE_ADDRESS = "Cửa Hàng Laptop Store"
+STORE_TAX_ID = "Hệ thống Quản lý Bán hàng Laptop"
+STORE_HOTLINE = "Hỗ trợ kỹ thuật & bảo hành tại cửa hàng"
+
 
 
 class Exporter:
@@ -84,9 +85,9 @@ class Exporter:
 
             for idx, item in enumerate(cart_items, 1):
                 name = item.get('name', 'N/A')
-                qty = item.get('quantity', 0)
+                qty = item.get('quantity', item.get('qty', 0))
                 price = item.get('price', 0)
-                subtotal = qty * price
+                subtotal = item.get('total', qty * price)
                 table_data.append([
                     str(idx),
                     name,
@@ -152,9 +153,8 @@ class Exporter:
             # Đảm bảo columns khớp với thứ tự của list tuple truyền vào từ ProductService.get_all_products()
             # Giả sử tuple: (id, category, name, brand, supplier_id, import_price, price, stock, cpu, ram, screen, hard_drive, gpu, weight, os, description, is_active)
             df = pd.DataFrame(products_data)
-            # Lọc các cột cần thiết (chỉ số 0, 2, 1, 3, 6, 7, 8, 9, 11, 10) để khớp với code cũ
-            # Old query: id, name, category, brand, price, stock_quantity, spec_cpu, spec_ram, spec_hard_drive, spec_screen
-            df = df[[0, 2, 1, 3, 6, 7, 8, 9, 11, 10]]
+            # Cột chuẩn từ get_all_products(): 0:id, 2:name, 3:category, 4:brand, 6:price, 7:stock, 8:cpu, 9:ram, 11:hdd, 10:screen
+            df = df[[0, 2, 3, 4, 6, 7, 8, 9, 11, 10]]
             df.columns = ['ID', 'Tên SP', 'Loại', 'Hãng', 'Giá bán', 'Tồn kho', 'CPU', 'RAM', 'Ổ cứng', 'Màn hình']
             
             df.to_excel(filepath, index=False, engine='openpyxl')

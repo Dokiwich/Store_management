@@ -23,7 +23,7 @@ class DashboardTab(ctk.CTkFrame): # Kế thừa CTkFrame
         inner_ctrl.pack(fill="x", padx=20, pady=15)
 
         # Tiêu đề
-        ctk.CTkLabel(inner_ctrl, text="📊 BẢNG ĐIỀU KHIỂN", 
+        ctk.CTkLabel(inner_ctrl, text="BẢNG ĐIỀU KHIỂN", 
                      text_color=("#111827", "white"),
                      font=("Segoe UI", 16, "bold")).pack(side="left")
 
@@ -61,7 +61,7 @@ class DashboardTab(ctk.CTkFrame): # Kế thừa CTkFrame
         self.cb_year.set(str(self.years[0])) # Set default
 
         # Nút Làm mới
-        btn_refresh = ctk.CTkButton(inner_ctrl, text="🔄 Tải lại", width=100, 
+        btn_refresh = ctk.CTkButton(inner_ctrl, text="Tải lại", width=100, 
                       fg_color="#2563eb", hover_color="#1d4ed8",
                       command=self.update_chart)
         btn_refresh.pack(side="right")
@@ -166,8 +166,7 @@ class DashboardTab(ctk.CTkFrame): # Kế thừa CTkFrame
         
         # Donut Chart
         centre_circle = Circle((0,0),0.70,fc='white')
-        fig = ax.get_figure()
-        fig.gca().add_artist(centre_circle)
+        ax.add_artist(centre_circle)
 
         # Trang trí text
         ax.set_title("TỶ TRỌNG SẢN PHẨM ĐÃ BÁN", fontsize=14, fontweight='bold', color="#333")
